@@ -41,6 +41,14 @@ namespace backEnd.Controllers
             } 
         }
 
+        [HttpGet]
+        [Route("topicname/post/{id:int}")]
+        public async Task<IActionResult> GetPostByIdAsync([FromRoute] int id)
+        {
+            Post post = await topicObj.GetPostByIdAsyncFromDB(id);
+            return Ok(post);
+        }
+
         [HttpPost]
         [Route("post")]
         public async Task<IActionResult> CreatePost([FromBody] Post post)

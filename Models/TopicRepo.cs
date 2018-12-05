@@ -40,6 +40,14 @@ namespace quizartsocial_backend
                                .ToListAsync();
             return posts;
         }
+
+        public async Task<Post> GetPostByIdAsyncFromDB(int postId)
+        {
+            Post post = await context.Posts
+                        .FirstOrDefaultAsync(t => t.postId == postId);
+            return  post;
+        }
+
         // public void GetTopicsFromRabbitMQ()
         // {
         //     var factory = new ConnectionFactory() { HostName = "192.168.176.4", UserName = "rabbitmq", Password = "rabbitmq" };
