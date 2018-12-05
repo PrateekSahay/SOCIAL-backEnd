@@ -22,7 +22,6 @@ namespace backEnd.Controllers
         [HttpGet("topics")]
         public async Task<IActionResult> GetTopics()
         {
-            // topicObj.GetTopicsFromRabbitMQ();
             List<Topic> allTopics = await topicObj.FetchTopicsFromDbAsync();
             return Ok(allTopics);
         }
@@ -76,7 +75,6 @@ namespace backEnd.Controllers
 
         [HttpDelete]
         [Route("topic/{id:int}")]
-
         public async Task<IActionResult> DeleteTopicFromIdAsync(int id)
         {
             await topicObj.DelTopicByIdAsync(id);

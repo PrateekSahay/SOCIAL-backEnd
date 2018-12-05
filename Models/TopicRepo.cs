@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Net;
 using System.Text;
-//using NotificationEngine.Model;
+using NotificationEngine.Services;
 
 namespace quizartsocial_backend
 {
@@ -23,6 +23,16 @@ namespace quizartsocial_backend
         }
         public async Task<List<Post>> GetPostsAsync(string topicName)
         {
+            // A user follows certain topics
+            // Hence it becomes logical to show those posts which
+            // were created recently for the followed topics.
+            
+            // First for a given user 
+            // get the ids of the post which are relevant
+            // to him based on above condition from Neo4j.
+            // Then get the exact posts from SQL based on Ids
+            // fetched from Neo4j.
+
             List<Post> posts = await context.Topics
                                .Where(t => t.topicName == topicName)
                                .Include("posts").SelectMany(s => s.posts)
@@ -53,6 +63,10 @@ namespace quizartsocial_backend
         // }
         public async Task<List<Topic>> FetchTopicsFromDbAsync()
         {
+            // Followed Topics.
+            // Topics on which games are played.
+            // Then, other topics.
+
             // Topic test1 = new Topic();
             // Topic test2 = new Topic();
             // test1.topicName = "book";
@@ -65,6 +79,7 @@ namespace quizartsocial_backend
 
         public async Task AddTopicToDBAsync(Topic obj)
         {
+            // Needs logic to create topics in GraphDB + SQL.
             Console.WriteLine("---------{0}----------",obj.topicName);
             if (context.Topics.FirstOrDefault(n => n.topicName == obj.topicName) == null)
             {
@@ -73,6 +88,7 @@ namespace quizartsocial_backend
                 await context.SaveChangesAsync();
             }
         }
+
         public async Task DelTopicFromDBAsync(string topicName)
         {
             Console.WriteLine("-----------------entered--------------");
@@ -101,12 +117,18 @@ namespace quizartsocial_backend
 
         public async Task AddPostToDBAsync(Post obj)
         {
+            // Needs to store the complete post in SQL
+            // And only the Id of the post in Neo4j.
+            // Also needs to create relationships between
+            // the post-author, post-topic.
             await context.Posts.AddAsync(obj);
             await context.SaveChangesAsync();
         }
 
         public async Task AddUserToDBAsync(User obj)
         {
+            // Needs to store the complete User in SQL
+            // And only the Id of the User in Neo4j.
             if (context.Users.FirstOrDefault(n => n.userId == obj.userId) == null)
             {
                 await context.Users.AddAsync(obj);
@@ -116,11 +138,22 @@ namespace quizartsocial_backend
 
         public async Task AddCommentToDBAsync(Comment obj)
         {
-           // Notification notification = new Notification();
-           // notification.Message = obj.userId+"is commented on your post";
-           // notification.TargetUrl = "http://172.23.238.164:5002/api/posts/"+obj.postId;
-          //  Task<List<string>> Temp  = System.Threading.Tasks.Task<List<string>>.Run(() => GetUsersAsync(obj.postId).Result) ;
-           // notification.Users = Temp.Result;
+            // Needs to store all the comments in SQL
+            // Needs to store only Id in Neo4j
+            // Also needs to create relationships
+            // between comment->post, authorOfComment(user)->comment.
+            
+            // Also needs to produce in RabbitMQ.
+            // To produce in RabbitMQ it needs set of 
+            // interested users which needs to be fetched
+            // from Neo4j.
+
+            Notification notification = new Notification();
+            notification.Message = obj.userId+"is commented on your post";
+            notification.TargetUrl = "http://172.23.238.164:5002/api/posts/"+obj.postId;
+            // Task<List<string>> Temp  = System.Threading.Tasks.Task<List<string>>.Run(() => GetUsersAsync(obj.postId).Result) ;
+            List<string> listOfUsers = await GetUsersAsync(obj.postId);
+            notification.Users = listOfUsers;
             await context.Comments.AddAsync(obj);
             await context.SaveChangesAsync();
         }
