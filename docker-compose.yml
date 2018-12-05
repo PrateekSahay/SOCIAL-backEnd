@@ -17,8 +17,9 @@ services:
       SERVICE_5000_NAME: SocialServer
     environment:
       SQLSERVER_HOST: Server=quizrt-social-db;User=sa;Password=Your_password123
-    links:
+    depends_on:
       - quizrt-social-db
+      - neo4j
     ports:
       - "5000"
     networks:
