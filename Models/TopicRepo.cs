@@ -44,25 +44,35 @@ namespace quizartsocial_backend
         // Then get the exact posts from SQL based on Ids
         // fetched from Neo4j.
 
-        // public async Task<List<Post>> GetPersonalisedPostsAsync(string u_id)
-        // {
-        //     var topics = await graphobj.graph.Cypher
-        //                      .OptionalMatch("(u:User)-[:follows]-(t:Topic)")
-        //                      .Where((User u) => u.userId == u_id)
-        //                      .Return((u, t) => new
-        //                      {
-        //                          User = u.As<User>(),
-        //                          Topic = t.CollectAs<Topic>()
-        //                      })
-        //                      .ResultsAsync;
-        //     var topicslist = topics.SelectMany(c=>c.Topic).ToList();
+        public async Task<List<Post>> GetPersonalisedPostsAsync(string u_id)
+        {
+            var topics = await graphobj.graph.Cypher
+                        .OptionalMatch("(u:User)-[:follows]-(t:Topic)")
+                        .Where((User u) => u.userId == u_id)
+                        .Return((u, t) => new
+                        {
+                            User = u.As<User>(),
+                            Topic = t.CollectAs<Topic>()
+                        })
+                        .ResultsAsync;
+            var topicslist = topics.SelectMany(c=>c.Topic).ToList();
             
-        //     List<Post> listOfPosts = new List<Post>();
-        //     // foreach(let x in topicslist.)
-        //     topicslist.ForEach( a => {
-        //         listOfPosts.Add(a.topicId);
-        //     })
-        // }
+            List<Post> listOfPosts = new List<Post>();
+            foreach(var topic in topicslist)
+            {
+                Topic test = new Topic();
+                test = topic;
+                var postsOfATopic = context.Topics
+                .Where(t => t.topicId == topic.topicId)
+                .Include("posts").SelectMany(s => s.posts)
+                .Include("comments")
+                .ToList();
+                listOfPosts.AddRange(postsOfATopic);
+            }
+
+            return listOfPosts;
+
+        }
 
         public async Task<Post> GetPostByIdAsyncFromDB(int postId)
         {

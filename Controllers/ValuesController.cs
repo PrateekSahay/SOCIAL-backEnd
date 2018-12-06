@@ -50,6 +50,14 @@ namespace backEnd.Controllers
             return Ok(post);
         }
 
+        [HttpGet]
+        [Route("posts/{userId}")]
+        public async Task<IActionResult> PersonalisedPosts([FromRoute] string userId)
+        {
+            List<Post> personalisedPosts = await topicObj.GetPersonalisedPostsAsync(userId);
+            return Ok(personalisedPosts);
+        }
+
         [HttpPost]
         [Route("post")]
         public async Task<IActionResult> CreatePost([FromBody] Post post)
