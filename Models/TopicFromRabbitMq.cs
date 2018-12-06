@@ -25,7 +25,7 @@ namespace SocialServer.Consumers
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
             
-            channel.QueueDeclare(queue: "Topic", durable: true, exclusive: false, autoDelete: false, arguments: null);
+            channel.QueueDeclare(queue: "Topic", durable: false, exclusive: false, autoDelete: false, arguments: null);
             
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>

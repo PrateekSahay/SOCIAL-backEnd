@@ -58,7 +58,7 @@ namespace quizartsocial_backend
         //     var topicslist = topics.SelectMany(c=>c.Topic).ToList();
             
         //     List<Post> listOfPosts = new List<Post>();
-        //     foreach( )
+        //     foreach()
         // }
 
         public async Task<Post> GetPostByIdAsyncFromDB(int postId)
