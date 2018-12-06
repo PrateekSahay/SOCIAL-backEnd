@@ -30,13 +30,21 @@ namespace SocialServer.Consumers
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
             {
-                var body = ea.Body;
-                var message = Encoding.UTF8.GetString(body);
-                Console.WriteLine(message);
-                Topic obj = new Topic();
-                obj.topicName = message;
-                this.topicObj.AddTopicToDBAsync(obj);
-                Console.WriteLine(" [x] Received {0}", message);
+                try 
+                {
+                    var body = ea.Body;
+                    var message = Encoding.UTF8.GetString(body);
+                    Console.WriteLine(message);
+                    Topic obj = new Topic();
+                    obj.topicName = message;
+                    Console.WriteLine(" [x] Received {0}", message);
+                    this.topicObj.AddTopicToDBAsync(obj);
+                }
+                catch (System.Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
             };
             channel.BasicConsume(queue: "Topic", autoAck: true, consumer: consumer);
             Console.WriteLine(" Press [enter] to exit.");

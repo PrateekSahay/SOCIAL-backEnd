@@ -58,7 +58,10 @@ namespace quizartsocial_backend
         //     var topicslist = topics.SelectMany(c=>c.Topic).ToList();
             
         //     List<Post> listOfPosts = new List<Post>();
-        //     foreach()
+        //     // foreach(let x in topicslist.)
+        //     topicslist.ForEach( a => {
+        //         listOfPosts.Add(a.topicId);
+        //     })
         // }
 
         public async Task<Post> GetPostByIdAsyncFromDB(int postId)
@@ -86,24 +89,32 @@ namespace quizartsocial_backend
 
         public async Task AddTopicToDBAsync(Topic obj)
         {
-            // Needs logic to create topics in GraphDB + SQL.
-            Console.WriteLine("---------{0}----------", obj.topicName);
-            if (context.Topics.FirstOrDefault(n => n.topicName == obj.topicName) == null)
+            try 
             {
-                Console.WriteLine("rabbit -topic getting inserted---", obj.topicName);
-                await context.Topics.AddAsync(obj);
-                await context.SaveChangesAsync();
-            }
-
-            await this.graphobj.graph.Cypher
-                .Create("(t:Topic)")
-                .Set("t={obj}")
-                .WithParams(new
+                Console.WriteLine("---------{0}----------", obj.topicName);
+                if (context.Topics.FirstOrDefault(n => n.topicName == obj.topicName) == null)
                 {
-                    obj
-                })
-                .ExecuteWithoutResultsAsync();
+                    Console.WriteLine("rabbit -topic getting inserted---", obj.topicName);
+                    await context.Topics.AddAsync(obj);
+                    await context.SaveChangesAsync();
+                }
 
+                await this.graphobj.graph.Cypher
+                    .Create("(t:Topic)")
+                    .Set("t={obj}")
+                    .WithParams(new
+                    {
+                        obj
+                    })
+                    .ExecuteWithoutResultsAsync();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
+            // Needs logic to create topics in GraphDB + SQL.            
         }
 
         public async Task DelTopicFromDBAsync(string topicName)
