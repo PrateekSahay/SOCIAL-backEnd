@@ -15,6 +15,7 @@ using quizartsocial_backend;
 using quizartsocial_backend.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using SocialServer.Consumers;
+using quizartsocial_backend.Services;
 
 namespace backEnd
 {
@@ -40,7 +41,20 @@ namespace backEnd
             
             services.AddScoped<ITopic, TopicRepo>();
             
-            // services.AddSingleton<GraphDbConnection>();
+            services.AddSingleton<GraphDb>();
+            services.Configure<Neo4jSettings>(
+                options =>
+                {
+                    options.ConnectionString = Configuration.GetSection("Neo4j:ConnectionString").Value;
+                    options.ContainerConnectionString = Configuration.GetSection("Neo4j:ContainerConnectionString").Value;
+                    options.IsDockerized = Configuration["DOTNET_RUNNING_IN_CONTAINER"] != null;
+                    options.Username = Configuration.GetSection("Neo4j:Username").Value;
+                    options.Password = Configuration.GetSection("Neo4j:Password").Value;
+                    Console.WriteLine("-------------------------------------------------------");
+                    Console.WriteLine(options.ConnectionString);
+                    Console.WriteLine("-------------------------------------------------------");
+                }
+            );
             var dbContextOptionsBuilder = new DbContextOptionsBuilder<SocialContext>();
             var dbContextOptions = dbContextOptionsBuilder.UseSqlServer(connString).Options;
             var socialDbContext = new SocialContext(dbContextOptions);

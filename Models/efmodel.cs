@@ -18,6 +18,8 @@ namespace quizartsocial_backend.Models
             modelBuilder.Entity<Post>().HasMany(n => n.comments).WithOne().HasForeignKey(c => c.postId);
             modelBuilder.Entity<User>().HasMany(n => n.posts).WithOne().HasForeignKey(c => c.userId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<User>().HasMany(n => n.comments).WithOne().HasForeignKey(c => c.userId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<User>().HasMany(n => n.followedTopics).WithOne().HasForeignKey(c => c.userId);
+            modelBuilder.Entity<Topic>().HasMany(n => n.usersFollowing).WithOne().HasForeignKey(c => c.topicId);
         }
     }
 }

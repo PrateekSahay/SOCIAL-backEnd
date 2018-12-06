@@ -9,10 +9,13 @@ namespace quizartsocial_backend.Models
         [Key]
         public string userId { get; set; }
         public string userName { get; set; }
-        public string userImage { get; set; }
         public int score { get; set; }
         public List<Post> posts { get; set; }
         public List<Comment> comments { get; set; }
+        public List<Topic> followedTopics  {get; set; }
+        public int topicId {get; set; }
 
     }
 }
+
+ // public string userImage { get; set; }
