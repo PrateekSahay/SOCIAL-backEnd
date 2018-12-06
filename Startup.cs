@@ -39,7 +39,7 @@ namespace backEnd
             
             Console.WriteLine("dfkadjakjsdkajdajdskasdjaksdsdssssssssss"+connString);
             services.AddSingleton<GraphDb>();
-            services.AddSingleton<SocialContext>();
+            services.AddDbContext<SocialContext>();
             
             services.AddScoped<ITopic, TopicRepo>();
             services.AddScoped<ITopicFromRabbitMq, TopicConsumer>();
@@ -57,11 +57,11 @@ namespace backEnd
                     Console.WriteLine("-------------------------------------------------------");
                 }
             );
-            // var dbContextOptionsBuilder = new DbContextOptionsBuilder<SocialContext>();
-            // var dbContextOptions = dbContextOptionsBuilder.UseSqlServer(connString).Options;
-            // var socialDbContext = new SocialContext(dbContextOptions);
-           // var GraphContext = new GraphDb(graph);
-            // services.AddSingleton(s => new TopicConsumer(socialDbContext));
+        //     var dbContextOptionsBuilder = new DbContextOptionsBuilder<SocialContext>();
+        //     var dbContextOptions = dbContextOptionsBuilder.UseSqlServer(connString).Options;
+        //     var socialDbContext = new SocialContext(dbContextOptions);
+        //    var GraphContext = new GraphDb(graph);
+        //     services.AddSingleton(s => new TopicConsumer(socialDbContext));
             
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
