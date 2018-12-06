@@ -227,7 +227,7 @@ namespace quizartsocial_backend
             Notification notification = new Notification();
             notification.Message = comment.userId+"is commented on your post";
             notification.TargetUrl = "http://172.23.238.164:5002/api/posts/"+comment.postId;
-            Task<List<string>> Temp  = System.Threading.Tasks.Task<List<string>>.Run(() => GetUsersAsync(comment.postId).Result) ;
+            // Task<List<string>> Temp  = System.Threading.Tasks.Task<List<string>>.Run(() => GetUsersAsync(comment.postId).Result) ;
             List<string> listOfUsers = await GetUsersAsync(comment.postId);
             notification.Users = listOfUsers;
         }
