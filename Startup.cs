@@ -38,10 +38,12 @@ namespace backEnd
             services.AddDbContext<SocialContext>(options => options.UseSqlServer(connString));
             
             Console.WriteLine("dfkadjakjsdkajdajdskasdjaksdsdssssssssss"+connString);
+            services.AddSingleton<GraphDb>();
+            services.AddSingleton<SocialContext>();
             
             services.AddScoped<ITopic, TopicRepo>();
+            services.AddScoped<ITopicFromRabbitMq, TopicConsumer>();
             
-            services.AddSingleton<GraphDb>();
             services.Configure<Neo4jSettings>(
                 options =>
                 {
@@ -55,10 +57,11 @@ namespace backEnd
                     Console.WriteLine("-------------------------------------------------------");
                 }
             );
-            var dbContextOptionsBuilder = new DbContextOptionsBuilder<SocialContext>();
-            var dbContextOptions = dbContextOptionsBuilder.UseSqlServer(connString).Options;
-            var socialDbContext = new SocialContext(dbContextOptions);
-            services.AddSingleton(s => new TopicConsumer(socialDbContext));
+            // var dbContextOptionsBuilder = new DbContextOptionsBuilder<SocialContext>();
+            // var dbContextOptions = dbContextOptionsBuilder.UseSqlServer(connString).Options;
+            // var socialDbContext = new SocialContext(dbContextOptions);
+           // var GraphContext = new GraphDb(graph);
+            // services.AddSingleton(s => new TopicConsumer(socialDbContext));
             
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
@@ -86,7 +89,7 @@ namespace backEnd
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, TopicConsumer obj)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ITopicFromRabbitMq obj)
         {
             if (env.IsDevelopment())
             {

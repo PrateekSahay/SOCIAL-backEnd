@@ -6,15 +6,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using quizartsocial_backend.Models;
 using quizartsocial_backend;
+using quizartsocial_backend.Services;
 
 namespace SocialServer.Consumers
 {
-    public class TopicConsumer
+    public class TopicConsumer : ITopicFromRabbitMq
     {
         ITopic topicObj;
-        public TopicConsumer(SocialContext socialContext)
+        public TopicConsumer(SocialContext socialContext, GraphDb graph)
         {
-            this.topicObj = new TopicRepo(socialContext);
+            this.topicObj = new TopicRepo(socialContext, graph);
             GetTopicsFromRabbitMQ();
         }
         public void GetTopicsFromRabbitMQ()

@@ -11,18 +11,29 @@ using System.IO;
 using System.Net;
 using System.Text;
 using NotificationEngine.Services;
+using quizartsocial_backend.Services;
 
 namespace quizartsocial_backend
 {
     public class TopicRepo : ITopic
     {
         SocialContext context;
-        public TopicRepo(SocialContext _context)
+        GraphDb graph;
+        public TopicRepo(SocialContext _context, GraphDb _graph)
         {
             this.context = _context;
+            this.graph = _graph;
         }
-        public async Task<List<Post>> GetPostsAsync(string topicName)
+        public async Task<List<Post>> GetPostsForTopicAsync(string topicName)
         {
+            List<Post> posts = await context.Topics
+                               .Where(t => t.topicName == topicName)
+                               .Include("posts").SelectMany(s => s.posts)
+                               .Include("comments")
+                               .ToListAsync();
+            return posts;
+        }
+
             // A user follows certain topics
             // Hence it becomes logical to show those posts which
             // were created recently for the followed topics.
@@ -33,13 +44,11 @@ namespace quizartsocial_backend
             // Then get the exact posts from SQL based on Ids
             // fetched from Neo4j.
 
-            List<Post> posts = await context.Topics
-                               .Where(t => t.topicName == topicName)
-                               .Include("posts").SelectMany(s => s.posts)
-                               .Include("comments")
-                               .ToListAsync();
-            return posts;
-        }
+        // public async Task<List<Post>> GetPersonalisedPostsAsync()
+        // {
+
+
+        // }
 
         public async Task<Post> GetPostByIdAsyncFromDB(int postId)
         {
@@ -74,6 +83,8 @@ namespace quizartsocial_backend
                 await context.Topics.AddAsync(obj);
                 await context.SaveChangesAsync();
             }
+
+
         }
 
         public async Task DelTopicFromDBAsync(string topicName)

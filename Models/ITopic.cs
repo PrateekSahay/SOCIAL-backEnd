@@ -11,11 +11,13 @@ namespace quizartsocial_backend.Models
         Task AddPostToDBAsync(Post obj);
         Task AddUserToDBAsync(User obj);
         Task AddCommentToDBAsync(Comment obj);
-        Task<List<Post>> GetPostsAsync(string topicName);
+        Task<List<Post>> GetPostsForTopicAsync(string topicName);
+        // Task<List<Post>> GetPersonalisedPostsAsync();
         Task<Post> GetPostByIdAsyncFromDB(int postId);
         Task<List<Topic>> FetchTopicsFromDbAsync();
        // void GetTopicsFromRabbitMQ();
     }
+
 }
 
 // List<Topic> GetAllTopicName();

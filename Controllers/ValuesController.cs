@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using quizartsocial_backend.Models;
+using quizartsocial_backend.Services;
 
 namespace backEnd.Controllers
 {
@@ -15,7 +16,7 @@ namespace backEnd.Controllers
         ITopic topicObj;
         public SocialController(ITopic _topicObj)
         {
-            this.topicObj=_topicObj;
+            this.topicObj = _topicObj;
             //topicObj.GetTopicsFromRabbitMQ();
         }
        
@@ -30,7 +31,7 @@ namespace backEnd.Controllers
         [Route("posts/{topicName}")]
         public async Task<IActionResult> GetPosts(string topicName)
         {
-            List<Post> posts = await topicObj.GetPostsAsync(topicName);
+            List<Post> posts = await topicObj.GetPostsForTopicAsync(topicName);
             if(posts.Any())
             {
                 return Ok(posts);                      
