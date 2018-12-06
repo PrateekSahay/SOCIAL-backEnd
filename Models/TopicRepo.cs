@@ -18,11 +18,11 @@ namespace quizartsocial_backend
     public class TopicRepo : ITopic
     {
         SocialContext context;
-        GraphDb graph;
+        GraphDb graphobj;
         public TopicRepo(SocialContext _context, GraphDb _graph)
         {
             this.context = _context;
-            this.graph = _graph;
+            this.graphobj = _graph;
         }
         public async Task<List<Post>> GetPostsForTopicAsync(string topicName)
         {
@@ -34,27 +34,38 @@ namespace quizartsocial_backend
             return posts;
         }
 
-            // A user follows certain topics
-            // Hence it becomes logical to show those posts which
-            // were created recently for the followed topics.
-            
-            // First for a given user 
-            // get the ids of the post which are relevant
-            // to him based on above condition from Neo4j.
-            // Then get the exact posts from SQL based on Ids
-            // fetched from Neo4j.
+        // A user follows certain topics
+        // Hence it becomes logical to show those posts which
+        // were created recently for the followed topics.
 
-        // public async Task<List<Post>> GetPersonalisedPostsAsync()
+        // First for a given user 
+        // get the ids of the post which are relevant
+        // to him based on above condition from Neo4j.
+        // Then get the exact posts from SQL based on Ids
+        // fetched from Neo4j.
+
+        // public async Task<List<Post>> GetPersonalisedPostsAsync(string u_id)
         // {
-
-
+        //     var topics = await graphobj.graph.Cypher
+        //                      .OptionalMatch("(u:User)-[:follows]-(t:Topic)")
+        //                      .Where((User u) => u.userId == u_id)
+        //                      .Return((u, t) => new
+        //                      {
+        //                          User = u.As<User>(),
+        //                          Topic = t.CollectAs<Topic>()
+        //                      })
+        //                      .ResultsAsync;
+        //     var topicslist = topics.SelectMany(c=>c.Topic).ToList();
+            
+        //     List<Post> listOfPosts = new List<Post>();
+        //     foreach( )
         // }
 
         public async Task<Post> GetPostByIdAsyncFromDB(int postId)
         {
             Post post = await context.Posts
                         .FirstOrDefaultAsync(t => t.postId == postId);
-            return  post;
+            return post;
         }
 
         public async Task<List<Topic>> FetchTopicsFromDbAsync()
@@ -76,14 +87,22 @@ namespace quizartsocial_backend
         public async Task AddTopicToDBAsync(Topic obj)
         {
             // Needs logic to create topics in GraphDB + SQL.
-            Console.WriteLine("---------{0}----------",obj.topicName);
+            Console.WriteLine("---------{0}----------", obj.topicName);
             if (context.Topics.FirstOrDefault(n => n.topicName == obj.topicName) == null)
             {
-                Console.WriteLine("rabbit -topic getting inserted---",obj.topicName);
+                Console.WriteLine("rabbit -topic getting inserted---", obj.topicName);
                 await context.Topics.AddAsync(obj);
                 await context.SaveChangesAsync();
             }
 
+            await this.graphobj.graph.Cypher
+                .Create("(t:Topic)")
+                .Set("t={obj}")
+                .WithParams(new
+                {
+                    obj
+                })
+                .ExecuteWithoutResultsAsync();
 
         }
 
@@ -91,10 +110,10 @@ namespace quizartsocial_backend
         {
             Console.WriteLine("-----------------entered--------------");
             var topic = await context.Topics.FirstOrDefaultAsync(s => s.topicName == topicName);
-            if(topic != null)
+            if (topic != null)
             {
-                Console.WriteLine("-----------------name----------------"+topic.topicName);
-                context.Topics.Remove(topic);   
+                Console.WriteLine("-----------------name----------------" + topic.topicName);
+                context.Topics.Remove(topic);
                 Console.WriteLine("-----------removed------------");
             }
             await context.SaveChangesAsync();
@@ -102,24 +121,37 @@ namespace quizartsocial_backend
 
         public async Task DelTopicByIdAsync(int id)
         {
-            var  topic = await context.Topics.FirstOrDefaultAsync(s => s.topicId == id);
-            if(topic != null)
+            var topic = await context.Topics.FirstOrDefaultAsync(s => s.topicId == id);
+            if (topic != null)
             {
-                Console.WriteLine("-----------------name----------------"+topic.topicName);
-                context.Topics.Remove(topic);   
+                Console.WriteLine("-----------------name----------------" + topic.topicName);
+                context.Topics.Remove(topic);
                 Console.WriteLine("-----------removed------------");
             }
             await context.SaveChangesAsync();
         }
 
 
-        public async Task AddPostToDBAsync(Post obj)
+        public async Task AddPostToDBAsync(Post post)
         {
             // Needs to store the complete post in SQL
             // And only the Id of the post in Neo4j.
             // Also needs to create relationships between
             // the post-author, post-topic.
-            await context.Posts.AddAsync(obj);
+
+            var query = graphobj.graph.Cypher
+                        .Match("(u:User)", "(t:Topic)")
+                        .Where((User u) => u.userId == post.userId)
+                        .AndWhere((Topic t) => t.topicId == post.topicId)
+                        .Create("(u)-[:created]->(p:Post {post})-[:onTopic]->(t)")
+                        .WithParams(new
+                        {
+                            post
+                        });
+
+            Console.WriteLine(query.Query.QueryText);
+            await query.ExecuteWithoutResultsAsync();
+            await context.Posts.AddAsync(post);
             await context.SaveChangesAsync();
         }
 
@@ -131,29 +163,52 @@ namespace quizartsocial_backend
             {
                 await context.Users.AddAsync(obj);
                 await context.SaveChangesAsync();
+
+                await graphobj.graph.Cypher
+                .Create("(u:User)")
+                .Set("u={value}")
+                .WithParams(new
+                {
+                    id = obj.userId,
+                    obj
+                })
+                .ExecuteWithoutResultsAsync();
             }
+
         }
 
-        public async Task AddCommentToDBAsync(Comment obj)
+        public async Task AddCommentToDBAsync(Comment comment)
         {
             // Needs to store all the comments in SQL
             // Needs to store only Id in Neo4j
             // Also needs to create relationships
             // between comment->post, authorOfComment(user)->comment.
-            
+
             // Also needs to produce in RabbitMQ.
             // To produce in RabbitMQ it needs set of 
             // interested users which needs to be fetched
             // from Neo4j.
 
-            Notification notification = new Notification();
-            notification.Message = obj.userId+"is commented on your post";
-            notification.TargetUrl = "http://172.23.238.164:5002/api/posts/"+obj.postId;
-            // Task<List<string>> Temp  = System.Threading.Tasks.Task<List<string>>.Run(() => GetUsersAsync(obj.postId).Result) ;
-            List<string> listOfUsers = await GetUsersAsync(obj.postId);
-            notification.Users = listOfUsers;
-            await context.Comments.AddAsync(obj);
+            var query = graphobj.graph.Cypher
+               .Match("(u:User)", "(p:Post)")
+               .Where((User u) => u.userId == comment.userId)
+               .AndWhere((Post p) => p.postId == comment.postId)
+               .Create("(u)-[:writes]->(c:Comment {comment})-[:onPost]->(p)")
+               .WithParams(new
+               {
+                   comment
+               });
+            Console.WriteLine(query.Query.QueryText);
+            await query.ExecuteWithoutResultsAsync();
+            await context.Comments.AddAsync(comment);
             await context.SaveChangesAsync();
+
+            Notification notification = new Notification();
+            notification.Message = comment.userId+"is commented on your post";
+            notification.TargetUrl = "http://172.23.238.164:5002/api/posts/"+comment.postId;
+            Task<List<string>> Temp  = System.Threading.Tasks.Task<List<string>>.Run(() => GetUsersAsync(comment.postId).Result) ;
+            List<string> listOfUsers = await GetUsersAsync(comment.postId);
+            notification.Users = listOfUsers;
         }
 
         public async Task<List<string>> GetUsersAsync(int postId)
@@ -259,23 +314,23 @@ namespace quizartsocial_backend
 // Console.WriteLine(x+"asdadsasddsa");
 
 // public void GetTopicsFromRabbitMQ()
-        // {
-        //     var factory = new ConnectionFactory() { HostName = "192.168.176.4", UserName = "rabbitmq", Password = "rabbitmq" };
-        //     using (var connection = factory.CreateConnection())
-        //     using (var channel = connection.CreateModel())
-        //     {
-        //         channel.QueueDeclare(queue: "Topic", durable: false, exclusive: false, autoDelete: false, arguments: null);
+// {
+//     var factory = new ConnectionFactory() { HostName = "192.168.176.4", UserName = "rabbitmq", Password = "rabbitmq" };
+//     using (var connection = factory.CreateConnection())
+//     using (var channel = connection.CreateModel())
+//     {
+//         channel.QueueDeclare(queue: "Topic", durable: false, exclusive: false, autoDelete: false, arguments: null);
 
-        //         var consumer = new EventingBasicConsumer(channel);
-        //         consumer.Received += (model, ea) =>
-        //         {
-        //             var body = ea.Body;
-        //             var message = Encoding.UTF8.GetString(body);
-        //             Console.WriteLine(" [x] Received {0}", message);
-        //         };
-        //         channel.BasicConsume(queue: "Topic", autoAck: true, consumer: consumer);
+//         var consumer = new EventingBasicConsumer(channel);
+//         consumer.Received += (model, ea) =>
+//         {
+//             var body = ea.Body;
+//             var message = Encoding.UTF8.GetString(body);
+//             Console.WriteLine(" [x] Received {0}", message);
+//         };
+//         channel.BasicConsume(queue: "Topic", autoAck: true, consumer: consumer);
 
-        //         Console.WriteLine(" Press [enter] to exit.");
-        //         Console.ReadLine();
-        //     }
-        // }
+//         Console.WriteLine(" Press [enter] to exit.");
+//         Console.ReadLine();
+//     }
+// }

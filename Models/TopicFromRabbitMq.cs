@@ -20,11 +20,12 @@ namespace SocialServer.Consumers
         }
         public void GetTopicsFromRabbitMQ()
         {
-            var factory = new ConnectionFactory() { HostName = "rabbitmq", Port = 5672, UserName = "rabbitmq", Password = "rabbitmq" };
+            //var factory = new ConnectionFactory() { HostName = "rabbitmq", Port = 5672, UserName = "rabbitmq", Password = "rabbitmq" };
+            var factory =new ConnectionFactory() { HostName = "localhost" };
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
             
-            channel.QueueDeclare(queue: "Topic", durable: false, exclusive: false, autoDelete: false, arguments: null);
+            channel.QueueDeclare(queue: "Topic", durable: true, exclusive: false, autoDelete: false, arguments: null);
             
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
@@ -39,7 +40,6 @@ namespace SocialServer.Consumers
             };
             channel.BasicConsume(queue: "Topic", autoAck: true, consumer: consumer);
             Console.WriteLine(" Press [enter] to exit.");
-            Console.ReadLine();
         }
     
     }
