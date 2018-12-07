@@ -36,14 +36,6 @@ namespace backEnd
             var connString = Environment.GetEnvironmentVariable("SQLSERVER_HOST") ?? "Server=localhost\\SQLEXPRESS;Database=QuizRTSocialDb;Trusted_Connection=True;";
             
             services.AddDbContext<SocialContext>(options => options.UseSqlServer(connString));
-            
-            Console.WriteLine("dfkadjakjsdkajdajdskasdjaksdsdssssssssss"+connString);
-            services.AddDbContext<SocialContext>();
-            services.AddScoped<ITopic, TopicRepo>();
-            services.AddSingleton<GraphDb>();    
-            services.AddSingleton<ITopicFromRabbitMq, TopicConsumer>();
-
-            
             services.Configure<Neo4jSettings>(
                 options =>
                 {
@@ -57,6 +49,12 @@ namespace backEnd
                     Console.WriteLine("-------------------------------------------------------");
                 }
             );
+            
+            services.AddScoped<ITopic, TopicRepo>();
+            services.AddSingleton<GraphDb>();
+            services.AddSingleton<ITopicFromRabbitMq, TopicConsumer>();
+
+            
 
             // var dbContextOptionsBuilder = new DbContextOptionsBuilder<SocialContext>();
             // var dbContextOptions = dbContextOptionsBuilder.UseSqlServer(connString).Options;
