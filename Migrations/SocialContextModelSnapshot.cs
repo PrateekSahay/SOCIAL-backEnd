@@ -30,6 +30,8 @@ namespace backEnd.Migrations
 
                     b.Property<string>("userId");
 
+                    b.Property<string>("userName");
+
                     b.HasKey("commentId");
 
                     b.HasIndex("postId");
@@ -50,6 +52,8 @@ namespace backEnd.Migrations
                     b.Property<int>("topicId");
 
                     b.Property<string>("userId");
+
+                    b.Property<string>("userName");
 
                     b.HasKey("postId");
 

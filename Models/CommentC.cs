@@ -11,5 +11,6 @@ namespace quizartsocial_backend.Models
         public string comment { get; set; }
         public int postId { get; set; }
         public string userId { get; set; }
+        public string userName { get; set; }
     }
 }
