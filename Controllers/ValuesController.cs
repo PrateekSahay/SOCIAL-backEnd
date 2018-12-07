@@ -70,6 +70,10 @@ namespace backEnd.Controllers
         [Route("comment")]
         public async Task<IActionResult> CreateComment([FromBody] Comment comment)
         {
+            User user =new User();
+            user.userName = comment.userName;
+            user.userId = comment.userId;
+            await topicObj.AddUserToDBAsync(user);
             await topicObj.AddCommentToDBAsync(comment);
             return Ok();
         }          
