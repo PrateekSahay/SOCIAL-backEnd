@@ -23,6 +23,26 @@ namespace quizartsocial_backend
             this.context = _context;
             this.graphobj = _graph;
         }
+
+        public async Task CreatePost(Post post)
+        {
+            var user = context.Users.Find(post.userId);
+            if (user is null)
+            {
+                user = new User()
+                {
+                    userId = post.userId,
+                    userName = post.userName,
+                    posts = new List<Post>() { post },
+                };
+            }
+            else 
+            {
+                user.posts.Add(post);
+            }
+            await context.SaveChangesAsync();
+        }
+
         public async Task<List<Post>> GetPostsForTopicAsync(string topicName)
         {
             List<Post> posts = await context.Topics

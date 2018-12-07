@@ -62,7 +62,7 @@ namespace backEnd.Controllers
         [Route("post")]
         public async Task<IActionResult> CreatePost([FromBody] Post post)
         {
-            await topicObj.AddPostToDBAsync(post);
+            await topicObj.CreatePost(post);
             return Ok();
         }
 
