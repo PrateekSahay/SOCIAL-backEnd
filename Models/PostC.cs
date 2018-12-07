@@ -13,5 +13,7 @@ namespace quizartsocial_backend.Models
         public int topicId { get; set; }
         public string userId { get; set; }
         public string userName { get; set; }
+
+        public Topic topic { get; set; }
     }
 }
