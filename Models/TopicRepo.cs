@@ -169,16 +169,16 @@ namespace quizartsocial_backend
         public async Task<List<Post>> GetPersonalisedPostsAsync(string u_id)
         {
             //   var query = graphobj.graph.Cypher
-            var query = graphobj.graph.Cypher
-                    .Match($"(p)-[:onTopic]->(:Topic)<-[:follows]-(u:User {{UserId:'{u_id}' }})")
+            var query = await graphobj.graph.Cypher
+                    .Match($"(p)-[:onTopic]->(:Topic)<-[:follows]-(u:User {{userId:'{u_id}' }})")
                     // .Where((Follower u) => u.UserId == u_id)
                     // .AndWhere((Post p) => p.userId == u_id)
-                    .Return<Post>(p=>p.As<Post>());
-                    // .ResultsAsync;
-            Console.WriteLine(query.Query.QueryText);
+                    .Return<Post>(p=>p.As<Post>())
+                    .ResultsAsync;
+           // Console.WriteLine(query.Query.QueryText);
                 
-            // List<Post> posts = new List<Post>(query);
-            return null;
+             List<Post> posts = new List<Post>(query);
+            return posts;
         }
 
             
