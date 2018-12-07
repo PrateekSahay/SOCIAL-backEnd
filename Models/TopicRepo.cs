@@ -1,5 +1,4 @@
 using System;
-using Bogus;
 using System.Linq;
 using System.Collections.Generic;
 using quizartsocial_backend.Models;
@@ -15,7 +14,7 @@ using quizartsocial_backend.Services;
 
 namespace quizartsocial_backend
 {
-    public class TopicRepo : ITopic
+    public class TopicRepo : ITopic, IDisposable
     {
         SocialContext context;
         GraphDb graphobj;
@@ -236,6 +235,10 @@ namespace quizartsocial_backend
         {
             List<string> users = await context.Posts.Where(p => p.postId == postId).Select(u => u.userId).ToListAsync();
             return users;
+        }
+
+        public void Dispose() 
+        {
         }
     }
 }

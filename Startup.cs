@@ -38,10 +38,10 @@ namespace backEnd
             services.AddDbContext<SocialContext>(options => options.UseSqlServer(connString));
             
             Console.WriteLine("dfkadjakjsdkajdajdskasdjaksdsdssssssssss"+connString);
-            services.AddSingleton<GraphDb>();    
             services.AddDbContext<SocialContext>();
             services.AddScoped<ITopic, TopicRepo>();
-            services.AddScoped<ITopicFromRabbitMq, TopicConsumer>();
+            services.AddSingleton<GraphDb>();    
+            services.AddSingleton<ITopicFromRabbitMq, TopicConsumer>();
 
             
             services.Configure<Neo4jSettings>(

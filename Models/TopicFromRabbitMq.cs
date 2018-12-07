@@ -12,10 +12,10 @@ namespace SocialServer.Consumers
 {
     public class TopicConsumer : ITopicFromRabbitMq
     {
-        ITopic topicObj;
-        public TopicConsumer(SocialContext socialContext, GraphDb graph)
+    
+        private IServiceProvider _serviceProvider;
+        public TopicConsumer(IServiceProvider serviceProvider, GraphDb graph)
         {
-            this.topicObj = new TopicRepo(socialContext, graph);
             GetTopicsFromRabbitMQ();
         }
         public void GetTopicsFromRabbitMQ()
@@ -38,7 +38,10 @@ namespace SocialServer.Consumers
                     Topic obj = new Topic();
                     obj.topicName = message;
                     Console.WriteLine(" [x] Received {0}", message);
-                    this.topicObj.AddTopicToDBAsync(obj);
+                    using(var topicRepo = this._serviceProvider.GetRequiredService<TopicRepo>())
+                    {
+                        topicRepo.AddTopicToDBAsync(obj);
+                    }
                 }
                 catch (System.Exception e)
                 {
