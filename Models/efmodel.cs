@@ -14,7 +14,8 @@ namespace quizartsocial_backend.Models
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Topic>().HasMany(n => n.posts).WithOne().HasForeignKey(c => c.topicId);
+            // modelBuilder.Entity<Topic>().HasMany(n => n.posts).WithOne().HasForeignKey(c => c.topicId);
+            modelBuilder.Entity<Post>().HasOne(n => n.topic).WithMany(p => p.posts).HasForeignKey(c => c.topicId);
             modelBuilder.Entity<Post>().HasMany(n => n.comments).WithOne().HasForeignKey(c => c.postId);
             modelBuilder.Entity<User>().HasMany(n => n.posts).WithOne().HasForeignKey(c => c.userId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<User>().HasMany(n => n.comments).WithOne().HasForeignKey(c => c.userId).OnDelete(DeleteBehavior.Restrict);
