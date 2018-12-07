@@ -6,6 +6,7 @@ namespace quizartsocial_backend.Models
 {
     public interface ITopic
     {
+        Task<List<User>> GetAllUsersAsync();
         Task FollowTopic(Follower follower);
         Task<List<Post>> GetAllPosts(); 
         Task CreatePost(Post post);

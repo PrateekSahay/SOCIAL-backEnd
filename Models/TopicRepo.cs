@@ -150,6 +150,11 @@ namespace quizartsocial_backend
             return await context.Posts.Include("comments").ToListAsync();
         }
 
+        public async Task<List<User>> GetAllUsersAsync()
+        {
+            return await context.Users.ToListAsync();
+        }
+
         public async Task<List<Post>> GetPostsForTopicAsync(string topicName)
         {
             List<Post> posts = await context.Topics
