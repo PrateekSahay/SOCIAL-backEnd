@@ -239,7 +239,6 @@ namespace quizartsocial_backend
 
         public void Dispose() 
         {
-            context.Dispose();
         }
  
     }
