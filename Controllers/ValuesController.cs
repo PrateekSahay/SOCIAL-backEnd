@@ -62,6 +62,10 @@ namespace backEnd.Controllers
         [Route("post")]
         public async Task<IActionResult> CreatePost([FromBody] Post post)
         {
+            User user =new User();
+            user.userName = post.userName;
+            user.userId = post.userId;
+            await topicObj.AddUserToDBAsync(user);
             await topicObj.AddPostToDBAsync(post);
             return Ok();
         }
@@ -70,6 +74,10 @@ namespace backEnd.Controllers
         [Route("comment")]
         public async Task<IActionResult> CreateComment([FromBody] Comment comment)
         {
+            User user =new User();
+            user.userName = comment.userName;
+            user.userId = comment.userId;
+            await topicObj.AddUserToDBAsync(user);
             await topicObj.AddCommentToDBAsync(comment);
             return Ok();
         }          
