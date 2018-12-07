@@ -186,7 +186,7 @@ namespace quizartsocial_backend
 
                 await graphobj.graph.Cypher
                 .Create("(u:User)")
-                .Set("u={value}")
+                .Set("u={obj}")
                 .WithParams(new
                 {
                     id = obj.userId,
