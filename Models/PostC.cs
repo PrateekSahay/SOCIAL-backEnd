@@ -12,10 +12,6 @@ namespace quizartsocial_backend.Models
         public List<Comment> comments{get; set;}
         public int topicId { get; set; }
         public string userId { get; set; }
-<<<<<<< HEAD
         public string userName { get; set; }
-=======
-        public string userName { get; set;}
->>>>>>> a161ba57f39dd8ab4f1d9ae160dd0a4253d72d4f
     }
 }
