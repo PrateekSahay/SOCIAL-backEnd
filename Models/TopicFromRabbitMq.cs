@@ -16,6 +16,7 @@ namespace SocialServer.Consumers
         private IServiceProvider _serviceProvider;
         public TopicConsumer(IServiceProvider serviceProvider, GraphDb graph)
         {
+            _serviceProvider = serviceProvider;
             GetTopicsFromRabbitMQ();
         }
         public void GetTopicsFromRabbitMQ()
