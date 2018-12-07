@@ -33,7 +33,7 @@ namespace backEnd
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
            // services.AddDbContext<efmodel>();
-            var connString = Environment.GetEnvironmentVariable("SQLSERVER_HOST") ?? "Server=localhost\\SQLEXPRESS;Database=QuizRTSocialDb;Trusted_Connection=True;";
+            var connString = Environment.GetEnvironmentVariable("SQLSERVER_HOST") ?? "Server=localhost  ;User=sa;Password=Your_password123";
             
             services.AddDbContext<SocialContext>(options => options.UseSqlServer(connString));
             services.Configure<Neo4jSettings>(
@@ -52,7 +52,7 @@ namespace backEnd
             
             services.AddScoped<ITopic, TopicRepo>();
             services.AddSingleton<GraphDb>();
-            services.AddSingleton<ITopicFromRabbitMq, TopicConsumer>();
+            // services.AddSingleton<ITopicFromRabbitMq, TopicConsumer>();
 
             
 
@@ -87,7 +87,7 @@ namespace backEnd
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ITopicFromRabbitMq obj)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {

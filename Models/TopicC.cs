@@ -12,8 +12,7 @@ namespace quizartsocial_backend.Models
         public int topicId { get; set; }
         public string topicName { get; set; }
         public List<Post> posts { get; set; }
-        public string userId { get; set; }
-        public List<User> usersFollowing {get; set;}
+        public List<Follower> followers {get; set;}
 
     }
 }

@@ -26,7 +26,7 @@ namespace quizartsocial_backend
 
         public async Task CreatePost(Post post)
         {
-            var user = context.Users.Find(post.userId);
+            var user = await context.Users.Include(u => u.posts).Where(t => t.userId == post.userId).FirstOrDefaultAsync();
             if (user is null)
             {
                 user = new User()
@@ -42,11 +42,112 @@ namespace quizartsocial_backend
                 user.posts.Add(post);
             }
             await context.SaveChangesAsync();
+            await CreatePostInNeo4j(post);
         }
+
+        public async Task CreateComment(Comment comment)
+        {
+            var user = await context.Users.Include(u => u.comments).Where(t => t.userId == comment.userId)
+            .FirstOrDefaultAsync();
+            if(user is null)
+            {
+                user = new User()
+                {
+                    userId = comment.userId,
+                    userName = comment.userName,
+                    comments = new List<Comment>() { comment },
+                };
+                await context.Users.AddAsync(user);
+            }
+            else
+            {
+                user.comments.Add(comment);
+            }
+            await context.SaveChangesAsync();
+            await CreateCommentInNeo4j(comment);
+
+        }
+
+        public async Task FollowTopic(Follower followerToBeAdded)
+        {
+            var follower = context.Followers.Find(followerToBeAdded.TopicId, followerToBeAdded.UserId);
+            if (follower is null)
+            {
+                follower = followerToBeAdded;
+                context.Followers.Add(follower);
+                await context.SaveChangesAsync();
+            }
+            context.Entry(follower).Reference(t => t.Topic).Load();
+            context.Entry(follower).Reference(t => t.User).Load();
+            await CreateFollowsRelationshiopInNeo4j(follower);
+        }
+
+        public async Task CreateFollowsRelationshiopInNeo4j(Follower follower)
+        {
+            var query = graphobj.graph.Cypher
+                .Merge("(u:User { userId: {userId}, userName: {userName} })")
+                .Merge("(t:Topic { topicId: {topicId}, topicName: {topicName} })")
+                .Merge("(u)-[:follows]->(t)")
+                .WithParams(
+                    new 
+                    {
+                        topicId = follower.TopicId,
+                        topicName = follower.Topic.topicName,
+                        userName = follower.User.userName,
+                        userId = follower.UserId
+                    }
+                );
+            await query.ExecuteWithoutResultsAsync();
+        }
+
+        public async Task CreatePostInNeo4j(Post post)
+        {   
+            
+            var topic = context.Topics.Find(post.topicId);
+            var query = graphobj.graph.Cypher
+                .Merge("(u:User { userId: {userId}, userName: {userName} })")
+                .Merge("(t :Topic { topicId: {topicId}, topicName: {topicName} })")
+                .Merge("(p:Post {postId: {postId} })")
+                .Merge("(u)-[:authored]->(p)-[:onTopic]->(t)")
+                .WithParams(
+                    new 
+                    { 
+                        postId = post.postId, 
+                        // topic, 
+                        userName = post.userName, 
+                        userId = post.userId, 
+                        topicId = topic.topicId,
+                        topicName = topic.topicName,
+                    }
+                );
+            await query.ExecuteWithoutResultsAsync();
+        }
+
+        public async Task CreateCommentInNeo4j(Comment comment)
+        {
+            var post = context.Posts.Find(comment.postId);
+            var query = graphobj.graph.Cypher
+                .Merge("(u:User { userId: {userId}, userName: {userName} })")
+                .Merge("(p:Post { postId: {postId} })")
+                .Merge("(c:Comment {commentId: {commentId} })")
+                .Merge("(u)-[:commented]->(c)-[:onPost]->(p)")
+                .WithParams(
+                    new
+                    {
+                        commentId = comment.commentId,
+                        post,
+                        userName = comment.userName,
+                        userId = comment.userId,
+                        postId = post.postId,
+                    }
+                );
+            await query.ExecuteWithoutResultsAsync();
+        }
+
 
         public async Task<List<Post>> GetAllPosts()
         {
-            return await context.Posts.ToListAsync();
+            return await context.Posts.Include("comments").ToListAsync();
         }
 
         public async Task<List<Post>> GetPostsForTopicAsync(string topicName)
@@ -63,7 +164,7 @@ namespace quizartsocial_backend
         // Hence it becomes logical to show those posts which
         // were created recently for the followed topics.
 
-        // First for a given user 
+        // Fi   rst for a given user 
         // get the ids of the post which are relevant
         // to him based on above condition from Neo4j.
         // Then get the exact posts from SQL based on Ids
@@ -177,30 +278,6 @@ namespace quizartsocial_backend
             await context.SaveChangesAsync();
         }
 
-
-        public async Task AddPostToDBAsync(Post post)
-        {
-            // Needs to store the complete post in SQL
-            // And only the Id of the post in Neo4j.
-            // Also needs to create relationships between
-            // the post-author, post-topic.
-
-            var query = graphobj.graph.Cypher
-                        .Match("(u:User)", "(t:Topic)")
-                        .Where((User u) => u.userId == post.userId)
-                        .AndWhere((Topic t) => t.topicId == post.topicId)
-                        .Create("(u)-[:created]->(p:Post {post})-[:onTopic]->(t)")
-                        .WithParams(new
-                        {
-                            post
-                        });
-
-            Console.WriteLine(query.Query.QueryText);
-            await query.ExecuteWithoutResultsAsync();
-            await context.Posts.AddAsync(post);
-            await context.SaveChangesAsync();
-        }
-
         public async Task AddUserToDBAsync(User obj)
         {
             // Needs to store the complete User in SQL
@@ -215,7 +292,6 @@ namespace quizartsocial_backend
                 .Set("u={obj}")
                 .WithParams(new
                 {
-                    id = obj.userId,
                     obj
                 })
                 .ExecuteWithoutResultsAsync();

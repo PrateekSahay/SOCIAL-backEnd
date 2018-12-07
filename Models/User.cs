@@ -12,7 +12,7 @@ namespace quizartsocial_backend.Models
         public int score { get; set; }
         public List<Post> posts { get; set; }
         public List<Comment> comments { get; set; }
-        public List<Topic> followedTopics  {get; set; }
+        public List<Follower> FollowedTopics  {get; set; }
         public int topicId {get; set; }
 
     }

@@ -38,7 +38,7 @@ namespace backEnd.Controllers
             }
             else
             {
-                return NotFound();
+                return NotFound("Posts for this topic not found");
             } 
         }
 
@@ -50,6 +50,14 @@ namespace backEnd.Controllers
             return Ok(posts);
         }
 
+        [HttpPost]
+        [Route("follow")]
+        public async Task<IActionResult> FollowTopic(Follower follower)
+        {
+            await topicObj.FollowTopic(follower);
+            return Ok();
+        }
+
         [HttpGet]
         [Route("topicname/post/{id:int}")]
         public async Task<IActionResult> GetPostByIdAsync([FromRoute] int id)
@@ -59,18 +67,19 @@ namespace backEnd.Controllers
         }
 
         [HttpGet]
-        [Route("posts/{userId}")]
+        [Route("posts/user/{userId}")]
         public async Task<IActionResult> PersonalisedPosts([FromRoute] string userId)
         {
             List<Post> personalisedPosts = await topicObj.GetPersonalisedPostsAsync(userId);
-            return Ok(personalisedPosts);
+            return Ok(personalisedPosts);   
         }
 
         [HttpPost]
         [Route("post")]
         public async Task<IActionResult> CreatePost([FromBody] Post post)
         {
-            await topicObj.CreatePost(post);
+                await topicObj.CreatePost(post);
+             // await topicObj.AddPostToDBAsync;
             return Ok();
         }
 
@@ -78,11 +87,12 @@ namespace backEnd.Controllers
         [Route("comment")]
         public async Task<IActionResult> CreateComment([FromBody] Comment comment)
         {
-            User user =new User();
-            user.userName = comment.userName;
-            user.userId = comment.userId;
-            await topicObj.AddUserToDBAsync(user);
-            await topicObj.AddCommentToDBAsync(comment);
+            // User user =new User();
+            // user.userName = comment.userName;
+            // user.userId = comment.userId;
+            // await topicObj.AddUserToDBAsync(user);
+            // await topicObj.AddCommentToDBAsync(comment);
+            await topicObj.CreateComment(comment);
             return Ok();
         }          
         
@@ -111,82 +121,3 @@ namespace backEnd.Controllers
         }
     }
 }
-
-
-
-// GET api/values
-        
-        // [HttpGet]
-        // public IActionResult Get()
-        // {
-        //     int n=1;
-        //     // List<TopicC> lg=new List<TopicC>();
-        //     List<PostC> lg=new List<PostC>();
-        //     //List<UserC> lg=new List<UserC>();
-        //     for (int i = 0; i < n; i++){
-        //             // List<TopicC> tName = topicObj.GetAllTopicName();
-        //             // List<TopicC> tImage = topicObj.GetAllTopicImage();
-        //             // TopicC test=new TopicC();
-        //             // test.topic_name=tName[0].topic_name;
-        //             // test.topic_image=tImage[0].topic_image;
-        //             // lg.Add(test);
-        //             // topicObj.AddTopicToDB(test);
-        //             // List<PostC> tPost= topicObj.GetAllPost();
-        //             // PostC test=new PostC();
-        //             // test.posts=tPost[0].posts;
-        //             // test.TopicForeignKey=1;
-        //             // test.UserForeignKey=1;
-        //             // lg.Add(test);
-        //             // topicObj.AddPostToDB(test);
-        //             // List<UserC> tName = topicObj.GetAllUserName();
-        //             // List<UserC> tImage = topicObj.GetAllUserImage();
-        //             // UserC test=new UserC();
-        //             // test.user_name=tName[0].user_name;
-        //             // test.user_image=tImage[0].user_image;
-        //             // lg.Add(test);
-        //             // topicObj.AddUserToDB(test);
-                    
-        //    }
-        //    return Ok(lg);
-         
-        // }
-        //[Route("api/values/{id}")]
-        // GET api/values/5
-         // GET api/values/5
-        /*
-        [HttpGet("{id:string}")]
-        public ActionResult<string> Get(int id)
-        {
-            return "value";
-        }
-        */
-         // PUT api/values/5
-         
-        // [HttpPut("{id}")]
-        // public void Put(int id, [FromBody] string value)
-        // {
-        // }
-
-        // // DELETE api/values/5
-        // [HttpDelete("{id}")]
-        // public void Delete(int id)
-        // {
-        // }
-
-        //   [HttpPost]
-        // [Route("topics")]
-        // public IActionResult AllTopics([FromBody] Object value)
-        // {
-        //     Task<List<string>> topicReturns = System.Threading.Tasks.Task<string>.Run(() => topicObj.fetchTopicAsync().Result);
-        //     List<string> topicList = topicReturns.Result;
-        //     // JObject jo = (JObject)(value);
-        //     // string ttt = jo["topicName"].ToString();
-        //     // Console.WriteLine(ttt);
-        //       for(int i=0;i<topicList.Count;i++){
-        //           Topic test=new Topic();
-        //           test.topicName=topicList[i];
-        //           topicObj.AddTopicToDB(test);
-        //       }
-        //       return Ok();
-        // }
-        

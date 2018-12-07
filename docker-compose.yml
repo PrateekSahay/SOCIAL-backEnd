@@ -5,30 +5,28 @@ services:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: Your_password123
     image: microsoft/mssql-server-linux
-    volumes:
-      - ./data/mssql:/var/opt/mssql
     ports:
-      - "1433"
+      - "1433:1433"
     networks:
       - quizrt-social-server-network
-  quizrt-social-server:
-    build: .
-    labels: 
-      SERVICE_5000_NAME: SocialEngine
-    environment:
-      SQLSERVER_HOST: Server=quizrt-social-db;User=sa;Password=Your_password123
-    depends_on:
-      - quizrt-social-db
-      - neo4j
-    ports:
-      - "7009:5000"
-    networks:
-      - quizrt-social-server-network
+  # quizrt-social-server:
+  #   build: .
+  #   labels: 
+  #     SERVICE_5000_NAME: SocialEngine
+  #   environment:
+  #     SQLSERVER_HOST: Server=quizrt-social-db;User=sa;Password=Your_password123
+  #   depends_on:
+  #     - quizrt-social-db
+  #     - neo4j
+  #   ports:
+  #     - "7009:5000"
+  #   networks:
+  #     - quizrt-social-server-network
   neo4j:
     image: neo4j:latest
     ports:
-      - "7474"
-      - "7687"
+      - "7474:7474"
+      - "7687:7687"
     networks: 
       - quizrt-social-server-network
     environment:

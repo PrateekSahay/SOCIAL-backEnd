@@ -6,12 +6,13 @@ namespace quizartsocial_backend.Models
 {
     public interface ITopic
     {
+        Task FollowTopic(Follower follower);
         Task<List<Post>> GetAllPosts(); 
         Task CreatePost(Post post);
+        Task CreateComment(Comment comment);
         Task AddTopicToDBAsync(Topic obj);
         Task DelTopicFromDBAsync(string topicName);
         Task DelTopicByIdAsync(int id);
-        Task AddPostToDBAsync(Post obj);
         Task AddUserToDBAsync(User obj);
         Task AddCommentToDBAsync(Comment obj);
         Task<List<Post>> GetPostsForTopicAsync(string topicName);
