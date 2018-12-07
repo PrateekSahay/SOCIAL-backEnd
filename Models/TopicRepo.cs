@@ -175,10 +175,15 @@ namespace quizartsocial_backend
                     // .AndWhere((Post p) => p.userId == u_id)
                     .Return<Post>(p=>p.As<Post>())
                     .ResultsAsync;
-           // Console.WriteLine(query.Query.QueryText);
                 
-             List<Post> posts = new List<Post>(query);
-            return posts;
+            List<Post> listOfPosts = new List<Post>(query);
+            List<Post> posts = new List<Post>();
+            foreach(Post p in listOfPosts)
+            {
+                var post = context.Posts.Include("comments").FirstOrDefault(x => x.postId == p.postId);
+                posts.Add(post);
+            }
+        return posts;
         }
 
             
