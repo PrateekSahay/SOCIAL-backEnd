@@ -39,8 +39,9 @@ namespace SocialServer.Consumers
                     Topic obj = new Topic();
                     obj.topicName = message;
                     Console.WriteLine(" [x] Received {0}", message);
-                    using(var topicRepo = this._serviceProvider.GetRequiredService<ITopic>())
+                    using(var serviceScope = this._serviceProvider.CreateScope())
                     {
+                        var topicRepo = serviceScope.ServiceProvider.GetRequiredService<ITopic>();
                         topicRepo.AddTopicToDBAsync(obj);
                     }
                 }
