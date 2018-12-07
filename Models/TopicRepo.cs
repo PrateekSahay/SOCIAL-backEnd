@@ -170,8 +170,8 @@ namespace quizartsocial_backend
         {
             //   var query = graphobj.graph.Cypher
             var query = await graphobj.graph.Cypher
-                    .Match("(p)-[:onTopic]->(t:Topic)<-[:follows]-(u:User)")
-                    .Where((Follower u) => u.UserId == u_id)
+                    .Match($"(p)-[:onTopic]->(:Topic)<-[:follows]-(u:User {{UserId:'{u_id}' }})")
+                    // .Where((Follower u) => u.UserId == u_id)
                     // .AndWhere((Post p) => p.userId == u_id)
                     .Return<Post>(p=>p.As<Post>())
                     .ResultsAsync;
