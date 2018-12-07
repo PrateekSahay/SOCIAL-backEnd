@@ -43,6 +43,14 @@ namespace backEnd.Controllers
         }
 
         [HttpGet]
+        [Route("posts/all")]
+        public async Task<IActionResult> GetAllPosts()
+        {
+            var posts = await topicObj.GetAllPosts();
+            return Ok(posts);
+        }
+
+        [HttpGet]
         [Route("topicname/post/{id:int}")]
         public async Task<IActionResult> GetPostByIdAsync([FromRoute] int id)
         {

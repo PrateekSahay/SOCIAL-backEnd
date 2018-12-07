@@ -6,6 +6,7 @@ namespace quizartsocial_backend.Models
 {
     public interface ITopic
     {
+        Task<List<Post>> GetAllPosts(); 
         Task CreatePost(Post post);
         Task AddTopicToDBAsync(Topic obj);
         Task DelTopicFromDBAsync(string topicName);

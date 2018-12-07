@@ -35,12 +35,18 @@ namespace quizartsocial_backend
                     userName = post.userName,
                     posts = new List<Post>() { post },
                 };
+                await context.Users.AddAsync(user);
             }
             else 
             {
                 user.posts.Add(post);
             }
             await context.SaveChangesAsync();
+        }
+
+        public async Task<List<Post>> GetAllPosts()
+        {
+            return await context.Posts.ToListAsync();
         }
 
         public async Task<List<Post>> GetPostsForTopicAsync(string topicName)
