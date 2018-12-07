@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace quizartsocial_backend.Models
 {
-    public interface ITopic: IDisposable
+    public interface ITopic
     {
         Task AddTopicToDBAsync(Topic obj);
         Task DelTopicFromDBAsync(string topicName);
