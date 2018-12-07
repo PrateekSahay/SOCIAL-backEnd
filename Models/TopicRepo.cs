@@ -185,7 +185,7 @@ namespace quizartsocial_backend
 
         public async Task<Post> GetPostByIdAsyncFromDB(int postId)
         {
-            Post post = await context.Posts
+            Post post = await context.Posts.Include("comments")
                         .FirstOrDefaultAsync(t => t.postId == postId);
             return post;
         }
