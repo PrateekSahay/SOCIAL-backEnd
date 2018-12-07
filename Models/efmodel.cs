@@ -32,12 +32,12 @@ namespace quizartsocial_backend.Models
 
             // Seeddata
             
-            modelBuilder.Entity<Topic>().HasData(
-                new { topicId = 1, topicName = "Topic-1" },
-                new { topicId = 2, topicName = "Topic-2" },
-                new { topicId = 3, topicName = "Topic-3" },
-                new { topicId = 4, topicName = "Topic-4" }
-            );
+            // modelBuilder.Entity<Topic>().HasData(
+            //     new { topicId = 1, topicName = "Topic-1" },
+            //     new { topicId = 2, topicName = "Topic-2" },
+            //     new { topicId = 3, topicName = "Topic-3" },
+            //     new { topicId = 4, topicName = "Topic-4" }
+            // );
         }
     }
 }
