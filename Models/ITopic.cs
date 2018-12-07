@@ -16,19 +16,5 @@ namespace quizartsocial_backend.Models
         Task<List<Post>> GetPersonalisedPostsAsync(string userId);
         Task<Post> GetPostByIdAsyncFromDB(int postId);
         Task<List<Topic>> FetchTopicsFromDbAsync();
-       // void GetTopicsFromRabbitMQ();
     }
-
 }
-
-// List<Topic> GetAllTopicName();
-// List<Topic> GetAllTopicImage();
-// List<Post> GetAllPost();
-
-// List<UserC> GetAllUserName();
-// List<UserC> GetAllUserImage();
-// void AddUserToDB(User obj);
-// List<post> GetAllPosts();
-// List<comments> GetAllComments();
-// Task<List<string>> fetchTopicAsync();
-// void AddUser(User obj);

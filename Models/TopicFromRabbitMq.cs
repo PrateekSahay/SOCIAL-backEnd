@@ -28,8 +28,8 @@ namespace SocialServer.Consumers
             
             channel.QueueDeclare(queue: "Topic", durable: false, exclusive: false, autoDelete: false, arguments: null);
             
-            var consumer = new EventingBasicConsumer(channel);
-            consumer.Received += (model, ea) =>
+            var consumer = new AsyncEventingBasicConsumer(channel);
+            consumer.Received += async (model, ea) =>
             {
                 try 
                 {
@@ -42,7 +42,7 @@ namespace SocialServer.Consumers
                     using(var serviceScope = this._serviceProvider.CreateScope())
                     {
                         var topicRepo = serviceScope.ServiceProvider.GetRequiredService<ITopic>();
-                        topicRepo.AddTopicToDBAsync(obj);
+                        await topicRepo.AddTopicToDBAsync(obj);
                     }
                 }
                 catch (System.Exception e)
