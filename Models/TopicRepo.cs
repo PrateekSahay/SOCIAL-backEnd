@@ -14,7 +14,7 @@ using quizartsocial_backend.Services;
 
 namespace quizartsocial_backend
 {
-    public class TopicRepo : ITopic, IDisposable
+    public class TopicRepo : ITopic
     {
         SocialContext context;
         GraphDb graphobj;

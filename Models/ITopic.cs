@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace quizartsocial_backend.Models
 {
-    public interface ITopic
+    public interface ITopic: IDisposable
     {
         Task AddTopicToDBAsync(Topic obj);
         Task DelTopicFromDBAsync(string topicName);
