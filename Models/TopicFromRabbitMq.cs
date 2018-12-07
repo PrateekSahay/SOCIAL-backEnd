@@ -16,12 +16,13 @@ namespace SocialServer.Consumers
         private IServiceProvider _serviceProvider;
         public TopicConsumer(IServiceProvider serviceProvider, GraphDb graph)
         {
+            Console.Write("Inside Topic Consumer");
             _serviceProvider = serviceProvider;
             GetTopicsFromRabbitMQ();
         }
         public void GetTopicsFromRabbitMQ()
         {
-            var factory = new ConnectionFactory() { HostName = "rabbitmq", Port = 5672, UserName = "rabbitmq", Password = "rabbitmq" };
+            var factory = new ConnectionFactory() { HostName = "rabbitmq", Port = 5672, UserName = "rabbitmq", Password = "rabbitmq", DispatchConsumersAsync = true };
             // var factory =new ConnectionFactory() { HostName = "localhost" };
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
