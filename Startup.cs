@@ -52,7 +52,7 @@ namespace backEnd
             
             services.AddScoped<ITopic, TopicRepo>();
             services.AddSingleton<GraphDb>();
-            // services.AddSingleton<ITopicFromRabbitMq, TopicConsumer>();
+            services.AddSingleton<ITopicFromRabbitMq, TopicConsumer>();
 
             
 
