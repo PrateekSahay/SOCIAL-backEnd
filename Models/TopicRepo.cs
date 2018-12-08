@@ -24,6 +24,13 @@ namespace quizartsocial_backend
             this.graphobj = _graph;
         }
 
+        public async Task<List<Post>> GetAllPostsForAUser(string userId)
+        {
+            var posts = await context.Posts.Include("comments").Where(x => x.userId == userId).ToListAsync();
+            return posts;
+        }
+
+
         public async Task CreatePost(Post post)
         {
             var user = await context.Users.Include(u => u.posts).Where(t => t.userId == post.userId).FirstOrDefaultAsync();
