@@ -65,7 +65,11 @@ namespace quizartsocial_backend
             }
             await context.SaveChangesAsync();
             await CreateCommentInNeo4j(comment);
-
+            Notification notification = new Notification();
+            notification.Message = comment.userId+"is commented on your post";
+            notification.TargetUrl = "http://172.23.238.164:5002/api/posts/"+comment.postId;
+            List<string> listOfUsers = await GetUsersAsync(comment.postId);
+            notification.Users = listOfUsers;
         }
 
         public async Task FollowTopic(Follower followerToBeAdded)
@@ -314,12 +318,12 @@ namespace quizartsocial_backend
             await context.Comments.AddAsync(comment);
             await context.SaveChangesAsync();
 
-            Notification notification = new Notification();
-            notification.Message = comment.userId+"is commented on your post";
-            notification.TargetUrl = "http://172.23.238.164:5002/api/posts/"+comment.postId;
-            // Task<List<string>> Temp  = System.Threading.Tasks.Task<List<string>>.Run(() => GetUsersAsync(comment.postId).Result) ;
-            List<string> listOfUsers = await GetUsersAsync(comment.postId);
-            notification.Users = listOfUsers;
+            // Notification notification = new Notification();
+            // notification.Message = comment.userId+"is commented on your post";
+            // notification.TargetUrl = "http://172.23.238.164:5002/api/posts/"+comment.postId;
+            // // Task<List<string>> Temp  = System.Threading.Tasks.Task<List<string>>.Run(() => GetUsersAsync(comment.postId).Result) ;
+            // List<string> listOfUsers = await GetUsersAsync(comment.postId);
+            // notification.Users = listOfUsers;
         }
 
         public async Task<List<string>> GetUsersAsync(int postId)
