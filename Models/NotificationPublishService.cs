@@ -9,7 +9,7 @@ namespace NotificationEngine.Services
     {
         public void Publish(Notification notification)
         {
-            Console.WriteLine("---GoingRabbit---");
+            Console.WriteLine("---GoingRabbit---Notification Starts-----");
             var factory = new ConnectionFactory()
             {
                 HostName = "rabbitmq",

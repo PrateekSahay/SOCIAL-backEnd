@@ -66,10 +66,16 @@ namespace quizartsocial_backend
             await context.SaveChangesAsync();
             await CreateCommentInNeo4j(comment);
             Notification notification = new Notification();
+            Console.WriteLine("--------------Made notification obj");
             notification.Message = comment.userId+"is commented on your post";
+            Console.WriteLine("----------------Notification message");
             notification.TargetUrl = "http://172.23.238.164:5002/api/posts/"+comment.postId;
             List<string> listOfUsers = await GetUsersAsync(comment.postId);
+            Console.WriteLine("------------List of Users"+listOfUsers);
             notification.Users = listOfUsers;
+            NotificationProducerService obj = new NotificationProducerService();
+            Console.WriteLine("------Calling publish-----and notification obj---"+ notification);
+            obj.Publish(notification);
         }
 
         public async Task FollowTopic(Follower followerToBeAdded)
